@@ -53,22 +53,28 @@ if not os.path.exists("model.pkl"):
 print("Saving training finished, saving the model...")
 torch.save(model, "model.pkl")
 
+print("evaluating on test dataset...")
+test_set = torchvision.datasets.FashionMNIST(root="../data/", train=False, download=True, transform=transforms.Compose([transforms.ToTensor()]))
+test_loader = torch.utils.data.DataLoader(test_set, batch_size=10)
+examples = enumerate(test_loader)
+batch_idx, (example_data, example_targets) = next(examples)
 
-print("evaluating...")
+print("finding biases...")
 test_set = torch.rand(10,1,28,28) 
 
 # Import MNIST and use MNIST on the model
-
-new_test_set = torchvision.datasets.MNIST(root="../data/", train=False, download=True, transform=transforms.Compose([transforms.ToTensor()]))
-new_test_loader = torch.utils.data.DataLoader(train_set, batch_size=10)
-examples = enumerate(new_test_loader)
-batch_idx, (example_data, example_targets) = next(examples)
+mnist_test_set = torchvision.datasets.MNIST(root="../data/", train=False, download=True, transform=transforms.Compose([transforms.ToTensor()]))
+mnist_test_loader = torch.utils.data.DataLoader(mnist_test_set, batch_size=10)
+examples_mnist = enumerate(mnist_test_loader)
+batch_idx, (example_data_mnist, example_targets_mnist) = next(examples_mnist)
 
 model.eval()
 
 
 with torch.no_grad():
     outputs=model(test_set)
-    print(outputs)
     print(f"Random input: {outputs}")
-    outputs_mnist = model(example_data) 
+    outputs_mnist = model(example_data_mnist) 
+    print(f"MNIST dataset:{outputs_mnist}")
+    outputs_test = model(example_data)
+    print(f"Test data:{outputs_test}")

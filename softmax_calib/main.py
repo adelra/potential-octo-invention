@@ -5,6 +5,9 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from scipy import stats
+import seaborn
+import matplotlib.pyplot as plt
 train_set = torchvision.datasets.FashionMNIST(root="../data/", train=True, download=True, transform=transforms.Compose([transforms.ToTensor()]))
 
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=10)
@@ -52,9 +55,20 @@ torch.save(model, "model.pkl")
 
 
 print("evaluating...")
-test_set = torch.rand(1,1,28,28) 
+test_set = torch.rand(10,1,28,28) 
+
+# Import MNIST and use MNIST on the model
+
+new_test_set = torchvision.datasets.MNIST(root="../data/", train=False, download=True, transform=transforms.Compose([transforms.ToTensor()]))
+new_test_loader = torch.utils.data.DataLoader(train_set, batch_size=10)
+examples = enumerate(new_test_loader)
+batch_idx, (example_data, example_targets) = next(examples)
 
 model.eval()
-#print(model(test_set))
+
+
 with torch.no_grad():
-    print(model(test_set))
+    outputs=model(test_set)
+    print(outputs)
+    print(f"Random input: {outputs}")
+    outputs_mnist = model(example_data) 
